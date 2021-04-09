@@ -30,6 +30,7 @@ class GithubWebhookHandler():
 
     
     def update(self):
+        print('updating')
         if not (self.on_update is None):
             return self.on_update(self)
 
@@ -40,6 +41,7 @@ class GithubWebhookHandler():
 
 
     def restart(self):
+        print('updating')
         if not (self.on_restart is None):
             return self.on_restart(self)
 
