@@ -4,6 +4,7 @@ from flask import Blueprint
 from .handler import GithubWebhookHandler
 from typing import List
 import os
+import subprocess
 
 
 class GithubException(Exception):
@@ -46,7 +47,8 @@ class Github():
 
     @staticmethod
     def restart_itself(handler: GithubWebhookHandler):
-        os.execv('restart.bat')
+        subprocess.Popen(['restart.bat'])
+        raise KeyboardInterrupt('Update restart')
 
 
     @staticmethod
