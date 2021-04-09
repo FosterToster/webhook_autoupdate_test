@@ -45,6 +45,11 @@ class Github():
 
 
     @staticmethod
+    def restart_itself(handler: GithubWebhookHandler):
+        os.execv('restart.bat')
+
+
+    @staticmethod
     def streamed_response(handler):
         try:
             yield Github.perform_handler(handler)
@@ -124,6 +129,8 @@ class Github():
         :param on_after_update: callback function which will be called after update sequence
 
         '''
+        if not cls.__initialized:
+            raise GithubException('Module is not initialized. Call Github(app) first.')
 
         if not (cls.find_handler(repository_name, main_branch_name) is None):
             raise GithubException(f'Handler for repository {repository_name} and main branch {main_branch_name} alredy created')
