@@ -6,9 +6,11 @@ from gihub_webhook import git
 
 app.register_blueprint(git, url_prefix="/github_webhook")
 
+
 @app.route('/')
 def index():
     return 'asdf'
+
 
 if __name__ == '__main__':
     serve(app, listen="*:5550")
