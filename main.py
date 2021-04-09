@@ -1,11 +1,12 @@
 from flask import Flask
 from waitress import serve
+from github_webhook import Github
 
 app = Flask(__name__)
-from gihub_webhook import git
 
-app.register_blueprint(git, url_prefix="/github_webhook")
+Github(app)
 
+Github.new_handler('FosterToster/webhook_autoupdate_test')
 
 @app.route('/')
 def index():
