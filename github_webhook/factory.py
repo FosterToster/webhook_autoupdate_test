@@ -1,8 +1,10 @@
-from dataclasses import dataclass
+from datetime import datetime
 from flask import Flask, request, Response, stream_with_context
 from flask import Blueprint
 from .handler import GithubWebhookHandler
 from typing import List
+import os
+
 
 class GithubException(Exception):
     pass
@@ -32,8 +34,18 @@ class Github():
         app.register_blueprint(self.__class__.blueprint, url_prefix=route)
         self.__class__.__initialized = True
 
+
+
     @staticmethod
-    def sparated_response(handler):
+    def update_itself(handler:GithubWebhookHandler):
+        os.system(f'git pull origin {handler.main_branch_name}')
+        os.system(f'git add . ')
+        os.system(f'git commit -m "automatic update at {datetime.now().isoformat()}"')
+        os.system(f'git push origin {handler.production_branch_name}')
+
+
+    @staticmethod
+    def streamed_response(handler):
         try:
             yield Github.perform_handler(handler)
             handler.restart()
@@ -68,7 +80,7 @@ class Github():
 
             handler.dataset = dataset
 
-            return Response(stream_with_context(Github.sparated_response(handler)))
+            return Response(stream_with_context(Github.streamed_response(handler)))
             
         except Exception as e:
             return f'{e.__class__.__name__}: {str(e)}'
@@ -93,12 +105,12 @@ class Github():
     @classmethod
     def find_handler(cls, repo, branch):
         for handler in cls.handlers:
-            if handler.repository_name == repo and handler.prod_branch_name == branch:
+            if handler.repository_name == repo and handler.main_branch_name == branch:
                 return handler
 
 
     @classmethod
-    def new_handler(cls, repository_name, production_branch_name, **options):
+    def new_handler(cls, repository_name, main_branch_name = 'master', production_branch_name = 'mas/prod', **options):
         '''Initialize new github webhook handler for flask application
 
         :param message_hook: substring of head_commit.message which will cause update sequence if found. Default = "Merge pull request "
@@ -113,14 +125,15 @@ class Github():
 
         '''
 
-        if not (cls.find_handler(repository_name, production_branch_name) is None):
-            raise GithubException(f'Handler for repository {repository_name} and branch {production_branch_name} alredy created')
+        if not (cls.find_handler(repository_name, main_branch_name) is None):
+            raise GithubException(f'Handler for repository {repository_name} and main branch {main_branch_name} alredy created')
 
 
 
         cls.handlers.append(
             GithubWebhookHandler(
                 repository_name, 
+                main_branch_name,
                 production_branch_name, 
                 options.get('message_hook', 'Merge pull request '),
                 options.get('on_before_update'),
