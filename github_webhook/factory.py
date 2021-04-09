@@ -28,7 +28,7 @@ class Github():
             raise GithubException('Flask application required')
 
         self.__class__.app = app
-        self.__class__.webhook_handler = self.__class__.blueprint.route('/')(self.__class__.webhook_handler) 
+        self.__class__.webhook_handler = self.__class__.blueprint.route('/', methods="POST")(self.__class__.webhook_handler) 
         app.register_blueprint(self.__class__.blueprint, url_prefix=route)
         self.__class__.__initialized = True
 
