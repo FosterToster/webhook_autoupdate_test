@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from flask import Flask, request
+from flask import Flask, request, Response, stream_with_context
 from flask import Blueprint
 from .handler import GithubWebhookHandler
 from typing import List
@@ -32,17 +32,26 @@ class Github():
         app.register_blueprint(self.__class__.blueprint, url_prefix=route)
         self.__class__.__initialized = True
 
+    @staticmethod
+    def sparated_response(handler):
+        try:
+            yield Github.perform_handler(handler)
+            handler.restart()
+            yield '!!!Restarted'
+        except Exception as e:
+            yield f'!!!Restarter Exception: {e.__class__.__name__}: {str(e)}'
+
     
     @staticmethod
     def webhook_handler():
         try:
             dataset = request.json
-            ref = dataset['ref'].get()
+            ref = dataset.get('ref')
 
             if ref is None:
                 raise GithubException('ref is not found in the payload')
             if ref.find('refs/heads/') >= 0:
-                branch = dataset['ref'].replace('refs/heads/')
+                branch = dataset['ref'].replace('refs/heads/', '')
             else:
                 raise GithubException('refs/heads/ not found for branch in the push payload')
 
@@ -59,24 +68,19 @@ class Github():
 
             handler.dataset = dataset
 
-            return Github.perform_handler(handler)
+            return Response(stream_with_context(Github.sparated_response(handler)))
             
         except Exception as e:
-            return f'{e.__class__.__name__}{str(e)}'
+            return f'{e.__class__.__name__}: {str(e)}'
 
     
-    @classmethod
+    @staticmethod
     def perform_handler(handler:GithubWebhookHandler):
         results = dict()
         try:
-            if not (handler.on_before_update is None):
-                results.update({'before_update': str(handler.on_before_update(handler))})
-            
-            if not (handler.on_update is None):
-                results.update({'update': str(handler.on_update(handler))})
-
-            if not (handler.on_after_update is None):
-                results.update({'after_update': str(handler.on_after_update(handler))})
+            results.update({'before_update': str(handler.before_update())})
+            results.update({'update': str(handler.update())})
+            results.update({'after_update': str(handler.before_update())})
         except Exception as e:
             raise
         else:
