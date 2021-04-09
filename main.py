@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 Github(app)
 
-Github.new_handler('FosterToster/webhook_autoupdate_test')
+Github.new_handler('FosterToster/webhook_autoupdate_test','master')
 
 @app.route('/')
 def index():

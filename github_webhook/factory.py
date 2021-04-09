@@ -97,10 +97,6 @@ class Github():
     def new_handler(cls, repository_name, production_branch_name, **options):
         '''Initialize new github webhook handler for flask application
 
-        repository_name: fullname of repository we waiting webhook pushes from. Example: FosterToster/flask_github_webhook
-        
-        :param prod_branch_name: name of the production branch in your repository. "master" by default
-
         :param message_hook: substring of head_commit.message which will cause update sequence if found. Default = "Merge pull request "
 
         :param on_update: callback function which will be called when update received. Note that it overrides default update sequence
@@ -111,12 +107,24 @@ class Github():
 
         :param on_after_update: callback function which will be called after update sequence
 
-        :param on_integrity_check: callback function which will be called on first startup after update sequence been executed
-
         '''
 
         if not (cls.find_handler(repository_name, production_branch_name) is None):
             raise GithubException(f'Handler for repository {repository_name} and branch {production_branch_name} alredy created')
+
+
+
+        cls.handlers.append(
+            GithubWebhookHandler(
+                repository_name, 
+                production_branch_name, 
+                options.get('message_hook', 'Merge pull request '),
+                options.get('on_before_update'),
+                options.get('on_update'),
+                options.get('on_after_update'),
+                options.get('on_restart')
+            ))
+        return cls.handlers[-1]
         
 
 
