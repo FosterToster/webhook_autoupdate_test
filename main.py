@@ -10,7 +10,7 @@ Github.new_handler('FosterToster/webhook_autoupdate_test','master')
 
 @app.route('/')
 def index():
-    return 'Test merge'
+    return 'Test merge !'
 
 
 if __name__ == '__main__':
