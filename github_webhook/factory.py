@@ -42,7 +42,7 @@ class Github():
             if ref is None:
                 raise GithubException('ref is not found in the payload')
             if ref.find('refs/heads/') >= 0:
-                branch = dataset['ref'].replace('refs/heads')
+                branch = dataset['ref'].replace('refs/heads/')
             else:
                 raise GithubException('refs/heads/ not found for branch in the push payload')
 
