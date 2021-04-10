@@ -10,7 +10,7 @@ Github.new_handler('FosterToster/webhook_autoupdate_test', 'master', 'mas/prod',
 
 @app.route('/')
 def index():
-    return 'YEFAFASFASF111  1!'
+    return 'YEFAFASFASF111  asdfasdfasd 1!'
 
 
 if __name__ == '__main__':
