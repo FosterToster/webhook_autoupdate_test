@@ -3,9 +3,8 @@ from flask import Flask, request, Response, stream_with_context
 from flask import Blueprint
 from .handler import GithubWebhookHandler
 from typing import List
+import sys
 import os
-import subprocess
-import signal
 
 
 class GithubException(Exception):
@@ -48,9 +47,7 @@ class Github():
 
     @staticmethod
     def restart_itself(handler: GithubWebhookHandler):
-        subprocess.Popen(['restart.bat'])
-        print('poped')
-        os.kill(os.getpid, signal.SIGINT)
+        os.execv(sys.executable, ['python'] + sys.argv)
         
 
     @staticmethod
