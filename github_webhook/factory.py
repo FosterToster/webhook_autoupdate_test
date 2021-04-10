@@ -5,6 +5,7 @@ from .handler import GithubWebhookHandler
 from typing import List
 import os
 import subprocess
+import signal
 
 
 class GithubException(Exception):
@@ -48,8 +49,9 @@ class Github():
     @staticmethod
     def restart_itself(handler: GithubWebhookHandler):
         subprocess.Popen(['restart.bat'])
-        raise KeyboardInterrupt('Update restart')
-
+        print('poped')
+        os.kill(os.getpid, signal.SIGINT)
+        
 
     @staticmethod
     def streamed_response(handler):
