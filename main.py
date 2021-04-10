@@ -11,7 +11,7 @@ Github.new_handler('FosterToster/webhook_autoupdate_test', 'master', 'mas/prod',
 
 @app.route('/')
 def index():
-    return 'OMG! It works!!!'
+    return 'Test it again!'
 
 
 if __name__ == '__main__':
