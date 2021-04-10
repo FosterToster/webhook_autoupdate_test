@@ -41,7 +41,7 @@ class GithubWebhookHandler():
 
 
     def restart(self):
-        print('updating')
+        print('restarting')
         if not (self.on_restart is None):
             return self.on_restart(self)
 
