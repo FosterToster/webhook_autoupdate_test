@@ -1,3 +1,4 @@
+print('start')
 from flask import Flask
 from waitress import serve
 from github_webhook import Github
